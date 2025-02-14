@@ -16,6 +16,9 @@ import java.util.Map;
 @RequestMapping("/compare")
 public class FileUploadController {
 
+	public String ARoot;
+	public String BRoot;
+	
     @PostMapping("/uploadFile")
     public ResponseEntity<Map<String, Object>> compareFiles(
             @RequestParam("fileA") MultipartFile fileA,
@@ -76,9 +79,5 @@ public class FileUploadController {
         }
     }
     
-    @GetMapping
-    public void getCurUserIp(){
-    	
-    	
-    }
+    
 }
