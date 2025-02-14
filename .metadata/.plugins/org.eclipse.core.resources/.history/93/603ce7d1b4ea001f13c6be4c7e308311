@@ -1,0 +1,76 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.Map;
+
+@Controller
+@RequestMapping("/compare")
+public class FileUploadController {
+
+    @PostMapping("/uploadFile")
+    public String compareFiles(
+            @RequestParam("fileA") MultipartFile fileA,
+            @RequestParam("fileB") MultipartFile fileB,
+            Model model) {
+
+        File savedFileA = null;
+        File savedFileB = null;
+
+        try {
+            // 임시 파일 생성
+            savedFileA = File.createTempFile("fileA_", ".xlsx");
+            savedFileB = File.createTempFile("fileB_", ".xlsx");
+
+            fileA.transferTo(savedFileA);
+            fileB.transferTo(savedFileB);
+
+            String ARoot = savedFileA.getAbsolutePath();
+            String BRoot = savedFileB.getAbsolutePath();
+
+            System.out.println("File A saved at: " + ARoot);
+            System.out.println("File B saved at: " + BRoot);
+
+            // Python 스크립트 경로 설정
+            String sheetNamePy = new File("src/main/resources/static/comparator/ver001/ver001_0.py").getAbsolutePath();
+
+            // Python 스크립트 실행
+            ProcessBuilder processBuilder = new ProcessBuilder("python", sheetNamePy, ARoot, BRoot);
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+
+            // Python 출력 읽기
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder output = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                // Jackson으로 JSON 문자열을 Map으로 변환
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> result = objectMapper.readValue(output.toString(), Map.class);
+                model.addAttribute("pythonResult", result);
+            } else {
+                model.addAttribute("error", "Python script failed with exit code " + exitCode);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", e.getMessage());
+
+        } finally {
+            // 임시 파일 삭제
+            if (savedFileA != null && savedFileA.exists()) savedFileA.delete();
+            if (savedFileB != null && savedFileB.exists()) savedFileB.delete();
+        }
+
+        return "compareResult";
+    }
+}

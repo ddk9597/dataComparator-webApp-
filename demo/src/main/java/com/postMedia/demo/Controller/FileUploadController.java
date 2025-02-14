@@ -1,9 +1,8 @@
 package com.postMedia.demo.Controller;
 
-import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,73 +10,75 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
-@Slf4j
+@RestController  // @Controller 대신 @RestController 사용
 @RequestMapping("/compare")
 public class FileUploadController {
 
-	public String ARoot;
-	public String BRoot;
-	
     @PostMapping("/uploadFile")
     public ResponseEntity<Map<String, Object>> compareFiles(
             @RequestParam("fileA") MultipartFile fileA,
             @RequestParam("fileB") MultipartFile fileB) {
 
         Map<String, Object> response = new HashMap<>();
+        File savedFileA = null;
+        File savedFileB = null;
 
         try {
-        	// 업로드된 파일을 저장할 경로 설정
-        	
-        	// 현재는 프로젝트 내에 임시 저장하고 분석이 끝나면 삭제하는 방식으로 메모리 관리.. 추후 개선 필요
-        	String saveDir = "src/main/resources/static/uploadedExcelFiles";
-        	File savedFileA = new File(saveDir, fileA.getOriginalFilename());
-        	File savedFileB = new File(saveDir, fileB.getOriginalFilename());
+            // 임시 파일 생성
+            savedFileA = File.createTempFile("fileA_", ".xlsx");
+            savedFileB = File.createTempFile("fileB_", ".xlsx");
+
             fileA.transferTo(savedFileA);
             fileB.transferTo(savedFileB);
-        	
-            System.out.printf("File A saved at: {}", savedFileA.getAbsolutePath());
-            System.out.printf("File B saved at: {}", savedFileB.getAbsolutePath());
+
+            String ARoot = savedFileA.getAbsolutePath();
+            String BRoot = savedFileB.getAbsolutePath();
+
+            System.out.println("File A saved at: " + ARoot);
+            System.out.println("File B saved at: " + BRoot);
 
             // Python 스크립트 경로 설정
-            String pythonScriptPath = new File("src/main/resources/scripts/comparisonVer001.py").getAbsolutePath();
-            String py000 = new File("src/main/resources/static/comparator/ver001/ver001_0.py").getAbsolutePath();
-            String py001 = new File("src/main/resources/static/comparator/ver001/ver001_1.py").getAbsolutePath();
-            
-            // Python 스크립트 실행 : 001_0.py : 
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                    "python", pythonScriptPath, savedFileA.getAbsolutePath(), savedFileB.getAbsolutePath()
-            );
+            String sheetNamePy = new File("src/main/resources/static/comparator/ver001/ver001_0.py").getAbsolutePath();
+
+            // Python 스크립트 실행
+            ProcessBuilder processBuilder = new ProcessBuilder("python", sheetNamePy, ARoot, BRoot);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
-            // Python 스크립트 출력 읽기
+            // Python 출력 읽기
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            StringBuilder resultBuilder = new StringBuilder();
+            StringBuilder output = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                resultBuilder.append(line);
+                output.append(line).append("\n");
             }
 
             int exitCode = process.waitFor();
             if (exitCode == 0) {
+                // Python JSON 결과를 Map으로 변환
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> result = objectMapper.readValue(output.toString(), Map.class);
+
+                // 필요한 JSON 응답 구성 (예시: fileA와 fileB의 시트 정보 반환)
                 response.put("status", "success");
-                response.put("comparison_result", resultBuilder.toString());
+                response.put("fileA", result.get("문화재정보A.xlsx"));
+                response.put("fileB", result.get("문화재정보B.xlsx"));
             } else {
                 response.put("status", "error");
-                response.put("message", "Python script execution failed.");
+                response.put("message", "Python script failed with exit code " + exitCode);
             }
 
-            return ResponseEntity.ok(response);
-
         } catch (Exception e) {
-        	
-        	System.out.printf("파일 처리 중 오류 발생", e);
+            e.printStackTrace();
             response.put("status", "error");
-            response.put("message", "파일 처리 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            response.put("message", e.getMessage());
+        } finally {
+            // 임시 파일 삭제
+            if (savedFileA != null && savedFileA.exists()) savedFileA.delete();
+            if (savedFileB != null && savedFileB.exists()) savedFileB.delete();
         }
+
+        // JSON 응답 반환
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-    
-    
 }

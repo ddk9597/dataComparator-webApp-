@@ -41,37 +41,50 @@
     <script>
         document.getElementById("uploadForm").addEventListener("submit", async function(event) {
             event.preventDefault();
-        
+            
             const formData = new FormData(this);
             
-            // 현재 브라우저의 호스트 주소 가져오기 
             const baseUrl = `${window.location.protocol}//${window.location.host}`;
             const response = await fetch(`${baseUrl}/compare/uploadFile`, {  
                 method: "POST",
                 body: formData
             });
-        
-            if (response.ok) {
-                console.log("요청이 잘 갔다.");
-                const result = await response.json();
-                const firstColumnValues = result.fileA.sheets.flatMap(sheet => sheet.first_column);
-        
-                const criteriaSelect = document.getElementById("criteriaSelect");
-                criteriaSelect.innerHTML = '<option selected disabled>기준값 선택</option>';
-                firstColumnValues.forEach(value => {
-                    const option = document.createElement("option");
-                    option.value = value;
-                    option.textContent = value;
-                    criteriaSelect.appendChild(option);
-                });
-        
-                document.getElementById("criteriaSection").style.display = "block";
-            } else {
-                alert("파일 업로드 중 오류가 발생했습니다.");
+    
+            try {
+                if (response.ok) {
+                    console.log("요청이 잘 갔다.");
+                    
+                    const contentType = response.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        const result = await response.json();
+                        console.log("응답 결과:", result);
+                        
+                        const firstColumnValues = result.fileA?.sheets?.flatMap(sheet => sheet.first_column) || [];
+                        
+                        const criteriaSelect = document.getElementById("criteriaSelect");
+                        criteriaSelect.innerHTML = '<option selected disabled>기준값 선택</option>';
+                        
+                        firstColumnValues.forEach(value => {
+                            const option = document.createElement("option");
+                            option.value = value;
+                            option.textContent = value;
+                            criteriaSelect.appendChild(option);
+                        });
+    
+                        document.getElementById("criteriaSection").style.display = "block";
+                    } else {
+                        console.error("JSON 응답이 아닙니다.");
+                        alert("서버에서 올바른 JSON 응답을 받지 못했습니다.");
+                    }
+                } else {
+                    alert("파일 업로드 중 오류가 발생했습니다.");
+                }
+            } catch (error) {
+                console.error("응답 처리 중 오류:", error);
+                alert("응답 처리 중 오류가 발생했습니다.");
             }
         });
-        
-
+    
         document.getElementById("confirmCriteria").addEventListener("click", function() {
             const selectedCriteria = document.getElementById("criteriaSelect").value;
             if (selectedCriteria) {
@@ -82,5 +95,7 @@
             }
         });
     </script>
+    
+
 </body>
 </html>
