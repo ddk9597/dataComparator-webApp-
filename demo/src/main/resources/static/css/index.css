@@ -1,0 +1,93 @@
+#previewContainer {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th,
+.table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  white-space: nowrap; /* 긴 텍스트 줄바꿈 방지 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 길면 "..."으로 표시 */
+}
+.table-hover tbody tr:hover {
+  background-color: #f1f1f1;
+}
+h3 {
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 5px;
+  display: inline-block;
+}
+td[title] {
+  cursor: pointer;
+}
+
+/* 📌 모달창을 화면 우측에 고정 */
+.modal-container {
+  position: fixed;
+  left: 5vw;
+  top: 70vh;
+  transform: translateY(-50%);
+  width: 250px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+/* 📌 토글 버튼 스타일 */
+.toggle-container {
+  text-align: center;
+  margin: 20px;
+}
+
+.btn-primary, .btn-secondary {
+  margin: 5px;
+}
+
+/* 📌 페이지네이션 스타일 */
+.pagination-container {
+  text-align: center;
+  margin-top: 10px;
+}
+.pagination-btn {
+  padding: 5px 10px;
+  margin: 5px;
+  border: 1px solid #007bff;
+  background: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.pagination-btn.active {
+  background: #0056b3;
+  font-weight: bold;
+}
+
+.test > *{
+  color: red;
+}
+
+/* 📌 자연스럽게 색이 변하도록 transition 추가 */
+.hovered-column, .hovered-row {
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* 📌 행 기준 선택 시 - 호버한 열 전체 하이라이트 */
+.hovered-column {
+  background-color: rgba(0, 123, 255, 0.3) !important;
+}
+
+/* 📌 열 기준 선택 시 - 호버한 행 전체 하이라이트 */
+.hovered-row {
+  background-color: rgba(255, 193, 7, 0.3) !important;
+}

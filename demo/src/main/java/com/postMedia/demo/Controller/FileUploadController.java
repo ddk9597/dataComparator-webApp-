@@ -42,7 +42,7 @@ public class FileUploadController {
                 output.append(line);
             }
 
-            System.out.println("Python Output: " + output); // 🔴 Python 출력 확인용 로그 추가
+            System.out.println("Python Output: " + output); // Python 출력 확인용 로그 추가
 
             int exitCode = process.waitFor();
             if (exitCode == 0) {

@@ -1,44 +1,49 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Excel 비교 결과</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .error {
-            color: red;
-            font-weight: bold;
-        }
-        .result {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-        .result h2 {
-            margin-top: 0;
-            color: #333;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .error {
+        color: red;
+        font-weight: bold;
+      }
+      .result {
+        border: 1px solid #ccc;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 5px;
+      }
+      .result h2 {
+        margin-top: 0;
+        color: #333;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Excel 비교 결과</h1>
 
     <div th:if="${error}" class="error">
-        <p>오류 발생: <span th:text="${error}"></span></p>
+      <p>오류 발생: <span th:text="${error}"></span></p>
     </div>
 
     <div th:if="${pythonResult}" class="result">
-        <div th:each="entry : ${pythonResult}">
-            <h2 th:text="${entry.key}"></h2>  <!-- 파일명 출력 -->
-            <p>시트 수: <span th:text="${entry.value['시트 수']}"></span></p>
-            <p>시트 이름: 
-                <span th:each="name : ${entry.value['시트 이름']}" th:text="name + ' '"></span>
-            </p>
-        </div>
+      <div th:each="entry : ${pythonResult}">
+        <h2 th:text="${entry.key}"></h2>
+        <!-- 파일명 출력 -->
+        <p>시트 수: <span th:text="${entry.value['시트 수']}"></span></p>
+        <p>
+          시트 이름:
+          <span
+            th:each="name : ${entry.value['시트 이름']}"
+            th:text="name + ' '"
+          ></span>
+        </p>
+      </div>
     </div>
-</body>
+  </body>
 </html>
