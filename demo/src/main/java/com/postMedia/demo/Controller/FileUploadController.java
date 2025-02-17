@@ -7,10 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.Map;
 
-@RestController  // @Controller 대신 @RestController 사용
+@RestController
 @RequestMapping("/compare")
 public class FileUploadController {
 
@@ -19,66 +18,50 @@ public class FileUploadController {
             @RequestParam("fileA") MultipartFile fileA,
             @RequestParam("fileB") MultipartFile fileB) {
 
-        Map<String, Object> response = new HashMap<>();
+        Map<String, Object> response;
         File savedFileA = null;
         File savedFileB = null;
 
         try {
-            // 임시 파일 생성
             savedFileA = File.createTempFile("fileA_", ".xlsx");
             savedFileB = File.createTempFile("fileB_", ".xlsx");
 
             fileA.transferTo(savedFileA);
             fileB.transferTo(savedFileB);
 
-            String ARoot = savedFileA.getAbsolutePath();
-            String BRoot = savedFileB.getAbsolutePath();
-
-            System.out.println("File A saved at: " + ARoot);
-            System.out.println("File B saved at: " + BRoot);
-
-            // Python 스크립트 경로 설정
-            String sheetNamePy = new File("src/main/resources/static/comparator/ver001/ver001_0.py").getAbsolutePath();
-
-            // Python 스크립트 실행
-            ProcessBuilder processBuilder = new ProcessBuilder("python", sheetNamePy, ARoot, BRoot);
+            String scriptPath = new File("src/main/resources/static/comparator/ver001/ver001_0.py").getAbsolutePath();
+            ProcessBuilder processBuilder = new ProcessBuilder("python", scriptPath, savedFileA.getAbsolutePath(), savedFileB.getAbsolutePath());
+            processBuilder.environment().put("PYTHONIOENCODING", "utf-8");
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
-            // Python 출력 읽기
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             StringBuilder output = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
+                output.append(line);
             }
+
+            System.out.println("Python Output: " + output); // 🔴 Python 출력 확인용 로그 추가
 
             int exitCode = process.waitFor();
             if (exitCode == 0) {
-                // Python JSON 결과를 Map으로 변환
                 ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> result = objectMapper.readValue(output.toString(), Map.class);
-
-                // 필요한 JSON 응답 구성 (예시: fileA와 fileB의 시트 정보 반환)
-                response.put("status", "success");
-                response.put("fileA", result.get("문화재정보A.xlsx"));
-                response.put("fileB", result.get("문화재정보B.xlsx"));
+                response = objectMapper.readValue(output.toString(), Map.class);
             } else {
-                response.put("status", "error");
-                response.put("message", "Python script failed with exit code " + exitCode);
+                response = Map.of("status", "error", "message", "Python script failed with exit code " + exitCode);
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            response.put("status", "error");
-            response.put("message", e.getMessage());
+            response = Map.of("status", "error", "message", e.getMessage());
         } finally {
-            // 임시 파일 삭제
             if (savedFileA != null && savedFileA.exists()) savedFileA.delete();
             if (savedFileB != null && savedFileB.exists()) savedFileB.delete();
         }
 
-        // JSON 응답 반환
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
+
+
+
