@@ -54,11 +54,12 @@ td[title] {
   margin: 5px;
 }
 
-/* 📌 페이지네이션 스타일 */
+/* 📌 페이지네이션 버튼 스타일 */
 .pagination-container {
   text-align: center;
-  margin-top: 10px;
+  margin-top: 15px;
 }
+
 .pagination-btn {
   padding: 5px 10px;
   margin: 5px;
@@ -68,6 +69,7 @@ td[title] {
   border-radius: 5px;
   cursor: pointer;
 }
+
 .pagination-btn.active {
   background: #0056b3;
   font-weight: bold;
