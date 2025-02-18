@@ -5,10 +5,13 @@ document.addEventListener("DOMContentLoaded", function () {
   let selectedColumns = {}; // 각 파일과 시트별 선택된 열 번호 저장 (Set 사용)
   let currentFile = ""; // 현재 선택된 파일 (업로드한 파일명)
   let currentSheetIndex = 0; // 현재 선택된 시트 인덱스
+	let fileUploadState = 0;
 
+	cosnt 
   // 파일 업로드 후 데이터 로드
   document.getElementById("uploadForm").addEventListener("submit", async function (event) {
     event.preventDefault();
+		
 
     const formData = new FormData(this);
     const response = await fetch("/compare/uploadFile", {
@@ -18,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fileData = await response.json();
     console.log("📌 서버 응답 데이터:", fileData);
+		fileUploadState = 1;
 
     if (!fileData || Object.keys(fileData).length === 0) {
       alert("서버에서 데이터를 받지 못했습니다.");

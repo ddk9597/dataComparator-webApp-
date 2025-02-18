@@ -41,7 +41,12 @@
           />
           <div style="color: red">최대 50MB의 파일만 업로드 가능</div>
         </div>
-        <button type="submit" class="btn btn-primary w-100">파일 업로드</button>
+        <div id="btnStateBox">
+          <button type="submit" class="btn btn-primary w-100" id="fileUploadBtn">파일 업로드</button>
+          <div id="btnAndStatus" class="noStat">
+            <div id="loadingCircle"></div>
+          </div>
+        </div>
       </form>
 
       <!-- 📌 기준 선택 모달창 (우측 고정) -->
@@ -102,5 +107,6 @@
     </div>
 
     <script src="/js/index.js"></script>
+    <script src="/js/modal.js"></script>
   </body>
 </html>
