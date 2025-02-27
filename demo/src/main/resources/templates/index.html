@@ -11,67 +11,75 @@
     <link rel="stylesheet" href="/css/index.css" />
   </head>
   <body>
-    <div class="container mt-5">
+    <div id="allContainer">
       <h1 class="text-center">EXCEL COMPARATOR</h1>
-      <form
-        id="uploadForm"
-        method="post"
-        enctype="multipart/form-data"
-        class="uploadFormBox"
-      >
-        <div class="mb-3">
-          <label for="fileA" class="form-label">A 파일 (기준 파일)</label>
-          <input
-            class="form-control"
-            type="file"
-            id="fileA"
-            name="fileA"
-            required
-          />
-          <div style="color: red">최대 50MB의 파일만 업로드 가능</div>
-        </div>
-        <div class="mb-3">
-          <label for="fileB" class="form-label">B 파일 (비교 파일)</label>
-          <input
-            class="form-control"
-            type="file"
-            id="fileB"
-            name="fileB"
-            required
-          />
-          <div style="color: red">최대 50MB의 파일만 업로드 가능</div>
-        </div>
-        <div id="btnStateBox">
-          <button type="submit" class="btn btn-primary w-100" id="fileUploadBtn">파일 업로드</button>
-          <div id="btnAndStatus" class="noStat">
-            <div id="loadingCircle"></div>
+      <div class="container mt-5">
+        <form
+          id="uploadForm"
+          method="post"
+          enctype="multipart/form-data"
+          class="uploadFormBox"
+        >
+          <div class="mb-3">
+            <label for="fileA" class="form-label">A 파일 (기준 파일)</label>
+            <input
+              class="form-control"
+              type="file"
+              id="fileA"
+              name="fileA"
+              required
+            />
+            <div style="color: red">최대 50MB의 파일만 업로드 가능</div>
           </div>
-        </div>
-      </form>
+          <div class="mb-3">
+            <label for="fileB" class="form-label">B 파일 (비교 파일)</label>
+            <input
+              class="form-control"
+              type="file"
+              id="fileB"
+              name="fileB"
+              required
+            />
+            <div style="color: red">최대 50MB의 파일만 업로드 가능</div>
+          </div>
+          <div id="btnStateBox">
+            <button
+              type="submit"
+              class="btn btn-primary w-100"
+              id="fileUploadBtn"
+            >
+              파일 업로드
+            </button>
+            <div id="btnAndStatus" class="noStat">
+              <div id="loadingCircle"></div>
+            </div>
+          </div>
+        </form>
 
-      <!-- 📌 기준 선택 모달창 (우측 고정) -->
-      <div id="criteriaModal" class="modal-container">
-        <div class="modal-content">
-          <h3>비교 기준 선택</h3>
-          <div class="button-group">
-            <button id="setCriteriaA" class="btn btn-outline-primary">
-              기준 파일 설정 (A)
-            </button>
-            <button id="setCriteriaB" class="btn btn-outline-secondary">
-              비교 파일 설정 (B)
-            </button>
+        <!-- 📌 기준 선택 모달창 (우측 고정) -->
+        <div id="criteriaModal" class="modal-container">
+          <div class="modal-content">
+            <h3>비교 기준 선택</h3>
+            <div class="button-group">
+              <button id="setCriteriaA" class="btn btn-outline-primary">
+                기준 파일 설정 (A)
+              </button>
+              <button id="setCriteriaB" class="btn btn-outline-secondary">
+                비교 파일 설정 (B)
+              </button>
+            </div>
+            <hr />
+            <p>기준 방식 선택:</p>
+            <div class="button-group">
+              <button id="columnCriteria" class="btn btn-outline-secondary">
+                열 기준
+              </button>
+              <button id="rowCriteria" class="btn btn-outline-primary">
+                행 기준
+              </button>
+            </div>
+            <div id="selectedCriteria" class="mt-3"></div>
           </div>
-          <hr />
-          <p>기준 방식 선택:</p>
-          <div class="button-group">
-            <button id="columnCriteria" class="btn btn-outline-secondary">
-              열 기준
-            </button>
-            <button id="rowCriteria" class="btn btn-outline-primary">
-              행 기준
-            </button>
-          </div>
-          <div id="selectedCriteria" class="mt-3"></div>
         </div>
       </div>
 

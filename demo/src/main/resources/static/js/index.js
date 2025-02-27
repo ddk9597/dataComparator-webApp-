@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentSheetIndex = 0; // 현재 선택된 시트 인덱스
 	let fileUploadState = 0;
 
-	cosnt 
   // 파일 업로드 후 데이터 로드
   document.getElementById("uploadForm").addEventListener("submit", async function (event) {
     event.preventDefault();
@@ -75,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("rowCriteria").classList.toggle("active", selectedCriteria[currentFile][currentSheetName] === "행 기준");
     document.getElementById("columnCriteria").classList.toggle("active", selectedCriteria[currentFile][currentSheetName] === "열 기준");
+
   }
 
   // 행 기준 선택 버튼
@@ -85,6 +85,8 @@ document.addEventListener("DOMContentLoaded", function () {
     selectedColumns[currentFile][currentSheetName].clear();
     updateCriteriaDisplay();
     alert(`${currentFile}의 ${currentSheetName} 시트에서 행 기준을 선택했습니다.`);
+    
+    
   });
 
   // 열 기준 선택 버튼
@@ -252,4 +254,21 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   });
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });
+
