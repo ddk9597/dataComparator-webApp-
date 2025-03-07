@@ -11,7 +11,10 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("uploadForm").addEventListener("submit", async function (event) {
     event.preventDefault();
 		
-
+    const loadingCircle = document.getElementById("loadingCircle");
+    const check = document.getElementById("check");
+    
+    loadingCircle.style.display = "flex";
     const formData = new FormData(this);
     const response = await fetch("/compare/uploadFile", {
       method: "POST",
@@ -21,6 +24,9 @@ document.addEventListener("DOMContentLoaded", function () {
     fileData = await response.json();
     console.log("📌 서버 응답 데이터:", fileData);
 		fileUploadState = 1;
+    loadingCircle.style.display="none";
+    check.style.display="block";
+
 
     if (!fileData || Object.keys(fileData).length === 0) {
       alert("서버에서 데이터를 받지 못했습니다.");
